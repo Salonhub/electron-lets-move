@@ -58,6 +58,31 @@ function getDialogMessage(needsAuthorization) {
   return detail;
 }
 
+
+function shellQuotedString(string) {
+  return `'${string.replace("'", "'\\''")}'`;
+}
+
+function relaunch(installLocation) {
+  const quotedInstallLocation = shellQuotedString(installLocation);
+
+  // The shell script waits until the original app process terminates.
+  // This is done so that the relaunched app opens as the front-most app. 
+  const script = `(while /bin/kill -0 ${process.pid} >&/dev/null; do /bin/sleep 0.1; done; /usr/bin/open ${quotedInstallLocation})`;
+
+  const child = cp.spawn(script, {
+    shell: true,
+    detached: true,
+    stdio: 'ignore',
+  });
+  child.unref();
+
+  // quit the app immediately
+  app.exit();
+}
+
+
+
 function moveToApplications(callback) {
   let resolve;
   let reject;
@@ -118,16 +143,7 @@ function moveToApplications(callback) {
       }
 
       // open the moved app
-      const execName = path.basename(process.execPath);
-      const execPath = path.join(installLocation, 'Contents', 'MacOS', execName);
-      const child = cp.spawn(execPath, [], {
-        detached: true,
-        stdio: 'ignore',
-      });
-      child.unref();
-
-      // quit the app immediately
-      app.exit();
+      relaunch(installLocation);
     };
 
     // move any existing application bundle to the trash
