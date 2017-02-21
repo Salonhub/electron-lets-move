@@ -31,9 +31,6 @@ function isInDownloadsFolder() {
 }
 
 function preferredInstallLocation() {
-  if (fs.existsSync(userApplicationPath)) {
-    return userApplicationPath;
-  }
   return rootApplicationPath;
 }
 
