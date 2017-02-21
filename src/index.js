@@ -45,12 +45,19 @@ function moveToTrash(directory) {
 function getDialogMessage(needsAuthorization) {
   let detail;
 
-  detail = 'I can move myself to the Applications folder if you\'d like.';
+  detail = 'Ik kan mezelf verplaatsen naar de Applicaties map als u dat wilt.';
   if (needsAuthorization) {
-    detail += ' Note that this will require an administrator password.';
-  } else if (isInDownloadsFolder()) {
-    detail += ' This will keep your Downloads folder uncluttered.';
+    detail += ' Hier heeft u een beheerderswachtwoord voor nodig.';
+  } else if (isInDownloadsFolder() || isInDiskImage()) {
+    detail += ' Dit zorgt er voor dat uw systeem schoon en netjes blijft.';
   }
+
+  // detail = 'I can move myself to the Applications folder if you\'d like.';
+  // if (needsAuthorization) {
+  //   detail += ' Note that this will require an administrator password.';
+  // } else if (isInDownloadsFolder()) {
+  //   detail += ' This will keep your Downloads folder uncluttered.';
+  // }
   return detail;
 }
 
@@ -94,8 +101,10 @@ function moveToApplications(callback) {
     const detail = getDialogMessage(needsAuthorization);
     const chosen = dialog.showMessageBox({
       type: 'question',
-      buttons: ['Move to Applications', 'Do Not Move'],
-      message: 'Move to Applications folder?',
+      // buttons: ['Move to Applications', 'Do Not Move'],
+      // message: 'Move to Applications folder?',
+      buttons: ['Verplaats naar Applicaties', 'Niet verplaatsen'],
+      message: 'Verplaats naar de Applicaties map?',
       detail,
     });
 
