@@ -30,6 +30,11 @@ function isInDownloadsFolder() {
   return exePath.startsWith(downloadsPath);
 }
 
+function isInDiskImage() {
+  const dirName = path.dirname(getBundlePath());
+  return dirName.startsWith("/Volumes/") && fs.existsSync(path.join(dirName, ".VolumeIcon.icns"));
+}
+
 function preferredInstallLocation() {
   return rootApplicationPath;
 }
@@ -149,6 +154,10 @@ function moveToApplications(callback) {
 
     // move the application bundle
     let command = `rm -rf "${installLocation}"; mv "${bundlePath}" "${installLocation}"; /usr/bin/xattr -d -r com.apple.quarantine "${installLocation}"`;
+    if (isInDiskImage()) {
+      command = `rm -rf "${installLocation}"; cp -a "${bundlePath}" "${installLocation}"; /usr/bin/xattr -d -r com.apple.quarantine "${installLocation}"`;
+    }
+
     if (needsAuthorization) {
       sudo.exec(command, { name: app.getName() }, moved);
     } else {
