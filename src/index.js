@@ -146,14 +146,9 @@ function moveToApplications(callback) {
       relaunch(installLocation);
     };
 
-    // move any existing application bundle to the trash
-    if (!moveToTrash(installLocation)) {
-      reject(new Error('Failed to move existing application to Trash, it may be in use.'));
-      return;
-    }
 
     // move the application bundle
-    const command = `mv ${bundlePath} ${installLocation}`;
+    let command = `rm -rf "${installLocation}"; mv "${bundlePath}" "${installLocation}"; /usr/bin/xattr -d -r com.apple.quarantine "${installLocation}"`;
     if (needsAuthorization) {
       sudo.exec(command, { name: app.getName() }, moved);
     } else {
